@@ -1,0 +1,51 @@
+defaultTasks 'clean', 'test', 'aggregate'
+apply plugin: 'java'
+// Agregar un comando que se llama "Aggregate" que es de serenity y para construir el reporte
+apply plugin: 'net.serenity-bdd.aggregator'
+
+// buildscript es para configurar a gradle
+//Es para descargar las dependencias que configurarn a gradle
+buildscript{
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        // plugin aggegator que esta en nuestra linea 2
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.80")
+
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    // Dependencias para poder automatizar con Serenity
+    implementation 'net.serenity-bdd:serenity-junit:2.0.80'
+    implementation 'net.serenity-bdd:serenity-cucumber:1.9.45'
+    implementation 'net.serenity-bdd:serenity-core:2.0.80'
+    implementation 'org.slf4j:slf4j-simple:1.7.7'
+    implementation 'com.google.guava:guava:23.0'
+
+}
+
+test.finalizedBy(aggregate)
+
+//Configurar propiedades del comando de ejecucion de pruebas con gradle
+test{
+//Ignorar los fallos y ejecutar todas pruebas asi alguna falle
+    ignoreFailures = true
+    // useJUnitPlatform()
+}
+
+// configurar el encoding del proyecto
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+//continuar asi falle alguna tarea de Gradle
+gradle.startParameter.continueOnFailure = true
+//gradle clean test aggregate & cd target/site/serenity & index.html
